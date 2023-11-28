@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+        <style>
+        .input{
+            display: flex;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background: skyblue;
+        }
+        .input textarea{
+            flex:1
+        }
+        .other{
+            text-align:right;
+        }
+        #chat div {
+            margin-bottom:10px;
+        }
+        #chat span {
+            display: inline-block;
+            padding: 10px;
+            background:gainsboro;
+            border-radius: 10px;
+        }
+        </style>
+    </head>
+    <body>
+        <div id="nickname-wrapper">
+            <input id="nickname" placeholder="Input your username">
+            <input id="room" placeholder="Input your room number">
+            <button type="button" id="login">Login</button>
+        </div>
+        <div id="chat-wrapper" style="display: none;">
+            <header>
+                <div>Username</div>
+                <div>10</div>
+            </header>
+            <aside>
+                <ul>
+                    <li>
+                        <a href="#">Room 1</a>
+                        <a href="#">Room 2</a>
+                    </li>
+                </ul>
+            </aside>
+            <div id="chat"></div>
+            <div class="input">
+                <textarea id="message" placeholder="Write here"></textarea>
+                <button type="button" id="submit">Send</button>
+            </div>
+        </div>
+        <script src="/socket.io/socket.io.js" charset="utf-8"></script>
+        <script type="text/javascript">
+            var io = io();
+            let isLogin = false;
+            let user;
+
+            io.on('chat', function(data) {
+                $("#chat").append(`
+                    <div class="${user.username === data.user ? 'self' : 'other'}">
+                        <span>${data.text}</span>
+                    </div>
+                `)
+            })
+
+            io.on('login', function(data) {
+                console.log(data);
+                if(!user && isLogin){
+                    user = data;
+                    $('#nickname-wrapper').hide()
+                    $('#chat-wrapper').show()
+                }
+            })
+
+            io.on('users', function(data) {
+                console.log('users', data);
+            })
+
+            io.on('notif', function(data) {
+                alert(data)
+            })
+
+            $("#login").click(function() {
+                isLogin = true;
+                io.emit('login', {
+                    room: $('#room').val(),
+                    username: $('#nickname').val()
+                })
+            })
+
+            $("#submit").click(function() {
+                io.emit('chat',
+                {
+                    user,
+                    message:$("#message").val()
+                })
+            })
+        </script>
+    </body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+    <style>
+      .input{
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        background: skyblue;
+      }
+      .input textarea{
+        flex:1
+      }
+      .other{
+        text-align:right;
+      }
+      #chat div {
+        margin-bottom:10px;
+      }
+      #chat span {
+        display: inline-block;
+        padding: 10px;
+        background:gainsboro;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="nickname-wrapper">
+      <input id="nickname" placeholder="input your username">
+      <input id="room" placeholder="input your room">
+      <button type="button" id="login">Login</button>
+    </div>
+    <div id="chat-wrapper" style="display:none">
+      <header>
+        <div>Username</div>
+        <div>10</div>
+      </header>
+      <aside>
+        <ul>
+          <li>
+            <a href="#">Room 1</a>
+            <a href="#">Room 2</a>
+          </li>
+        </ul>
+      </aside>
+      <div id="chat"></div>
+      <div class="input">
+        <textarea id="message" placeholder="message here"></textarea>
+        <button type="button" id="submit">submit</button>
+      </div>
+    </div>
+    <script src="/socket.io/socket.io.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      var io = io()
+      let isLogin = false;
+      let user;
+      io.on('chat', function(data) {
+        $("#chat").append(`
+          <div class="${user.username === data.user ? 'self' : 'other'}">
+            <span>${data.text}</span>
+          </div>`
+        )
+      })
+      io.on('login', function(data) {
+        console.log(data)
+        if(!user && isLogin){
+          user = data;
+          $('#nickname-wrapper').hide()
+          $('#chat-wrapper').show()
+        }
+      })
+      io.on('users', function(data) {
+        console.log('users', data)
+      })
+      io.on('notif', function(data) {
+        alert(data)
+      })
+      $("#login").click(function() {
+        isLogin = true;
+        io.emit('login', {
+          room: $('#room').val(),
+          username: $('#nickname').val()
+        })
+      })
+      $("#submit").click(function() {
+        io.emit('chat',
+          {
+            user,
+            message:$("#message").val()
+          }
+        )
+      })
+    </script>
+  </body>
+</html> -->
