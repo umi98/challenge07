@@ -2,3 +2,17 @@
 <p>Id : <b><%= user.id %></b></p>
 <p>Name : <b><%= user.name %></b></p>
 <p>Email : <b><%= user.email %></b></p>
+
+<script src="/socket.io/socket.io.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      var io = io()
+      let isLogin = false;
+      let user;
+      io.on('users', function(data) {
+        console.log('users', data)
+      })
+      io.on('notification', function(data) {
+        console.log(data)
+        alert(data)
+      })
+    </script>

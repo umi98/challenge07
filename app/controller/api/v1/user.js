@@ -7,27 +7,22 @@ const randtoken = require('rand-token');
 
 const prisma = new PrismaClient();
 
+function sendEmailReset(email, token) {
+    // const { email } = req.body;
+    // const token = token;
+    const subject = "Reset password";
+    let content = `<p>Permintaan mengubah password diterima. Untuk melanjutkan harap klik <a href="http://localhost:3000/reset-password?token=${token}">di sini</a>`;
+    sendMail(email, subject, content);
+}
+
 module.exports = {
-    sendEmailReset(email, token) {
-        // const { email } = req.body;
-        // const token = token;
-        const subject = "Reset password";
-        let content = `<p>Permintaan mengubah password diterima. Untuk melanjutkan harap klik <a href="http://localhost:3000/reset-password?token=${token}">di sini</a>`;
-        sendMail(email, subject, content);
-
-        res.status(200).json({
-            status: 'ok',
-            message: `Berhasil Register! silahkan cek email untuk verifikasi`,
-        })
-    },
-
     async resetPasswordEmail(req, res) {
         const { email } = req.body;
         const user = await prisma.user.findFirst({
             where: { email }
         })
         if (user) {
-            const resetLink = JWTsign(user.email);
+            const resetLink = toString(JWTsign(user));
             await prisma.user.update({
                 where: {
                     id: user.id
@@ -36,7 +31,7 @@ module.exports = {
                     resetLink: resetLink
                 }
             })
-            this.sendEmailReset(email, token);
+            sendEmailReset(email, resetLink);
 
             return res.status(200).json({
                 message: "Check email"

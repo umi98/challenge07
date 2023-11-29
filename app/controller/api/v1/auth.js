@@ -94,7 +94,6 @@ module.exports = {
                 }
             });
 
-            req.flash("success", "Berhasil register");
             return res.redirect('/login');
         } catch(e) {
             next(e);
@@ -118,6 +117,7 @@ module.exports = {
     },
     
     dashboard: async (req, res, next) => {
+        req.io.emit('notification', 'Hi berhasil sign in');
         res.render('dashboard', { user: req.user });
     }
 }
